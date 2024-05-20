@@ -273,3 +273,24 @@ docker compose -p kitchenpos up -d
 - 이미 생성된 메뉴(`Menu`)를 숨긴(**undisplay**)다.
   - 노출여부(`displayed`)는 숨김(`false`)상태로 변경한다.
 - 모든 메뉴(`Menu`)의 목록을 조회(**findAll**)할 수 있다.
+
+
+### 주문테이블(`OrderTable`)
+#### 속성
+- 주문테이블(`OrderTable`)은 식별자, 이름(`name`), 고객의 수(`numberOfGuests`), 점유여부(`occupied`)를 가진다.
+
+#### 행위
+- 주문테이블(`OrderTable`)을 생성(**create**)한다.
+  - 이름 (`name`)은 비워둘 수 없다.
+  - 고객의 수(`numberOfGuests`)는 0명 이다.
+  - 점유여부(`occupied`)는 점유안함(`false`)상태이다.
+- 해당 주문테이블(`OrderTable`)은 착석(**sit**)되었다.
+  - 점유여부(`occupied`)가 점유중(`true`)으로 변경한다.
+- 해당 주문테이블(`OrderTable`)을 초기화(**clear**)되었다.
+  - 해당 주문테이블`OrderTable`에 생성된 모든 주문(`Order`)의 주문 상태(`OrderStatus`)가 주문완료(`COMPLETED`) 이어야 한다.
+  - 점유여부(`occupied`)가 점유안함(`false`)으로 변경한다.
+  - 고객의 수(`numberOfGuests`)가 0으로 변경한다.
+- 해당 주문테이블(`OrderTable`)의 고객의 수를 변경(**change numberOfGuests**)한다.
+  - 변경할 고객의 수(`numberOfGuests`)는 0 이상 이어야 한다.
+  - 해당 주문테이블(`OrderTable`)이 점유중(`true`)인 상태이어야 한다.
+- 모든 주문테이블(`OrderTable`) 목록을 조회(**findAll**)한다.
