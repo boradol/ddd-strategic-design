@@ -196,6 +196,7 @@ docker compose -p kitchenpos up -d
 #### 행위
 - 상품(`Product`)을 생성(**create**)한다.
   - 이름(`name`)은 비워둘 수 없고, 비속어(profanity)가 포함될 수 없다.
+    - 비속어 탐지 시스템(Profanity Detection System)을 통해서 이름에 비속어가 포함되지 않음(`false`)을 확인한다.
   - 가격(`price`)은 비워둘 수 없고, 0원 이상이어야 한다.
 - 이미 생성된 상품(`Product`)의 가격을 변경(**change price**)한다.
   - 가격(`price`)은 비워둘 수 없고, 0원 이상이어야 한다.
@@ -253,6 +254,7 @@ docker compose -p kitchenpos up -d
 #### 행위
 - 메뉴(`Menu`)를 생성(**create**)한다.
   - 이름(`name`)은 비워둘 수 없고, 비속어(profanity)가 포함될 수 없다.
+    - 비속어 탐지 시스템(Profanity Detection System)을 통해서 이름에 비속어가 포함되지 않음(`false`)을 확인한다.
   - 가격(`price`)은 비워둘 수 없고, 0원 이상이어야 한다.
   - 노출여부(`dispalyed`)는 노출(`true`)상태이거나 숨김(`false`)상태 중 선택한다.
   - 이미 생성된 메뉴그룹(`menuGroup`)에 반드시 1개 포함시켜야 한다.
