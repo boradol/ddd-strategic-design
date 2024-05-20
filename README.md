@@ -306,3 +306,124 @@ docker compose -p kitchenpos up -d
 - 메뉴(`menu`)는 노출(`true`)상태여야 한다.
 - 수량(`quantity`)은 비워둘 수 없다.
 - 고객님이 주문을 생성할 때, 주문 아이템의 가격(`price`)과 현재 키친포스에 생성된 메뉴(`Menu`)의 가격(`price`)은 같아야 한다.
+
+
+### 주문(`Order`)
+#### [공통]
+##### 속성
+- 주문(`Order`)은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템(`OrderLineItem`)을 가진다.
+  - 주문유형(`type`)은 배달 주문(`DELIVERY`), 포장 주문(`TAKEOUT`), 매장내식사 주문(`EAT_IN`)으로 나뉜다.
+  - 주문상태(`status`)는 대기중(`WAITING`), 수락(`ACCEPTED`), 제공됨(`SERVED`), 완료(`COMPLETED`)의 공통 행위를 정의한다.
+
+##### 행위
+- 주문(`Order`)을 생성(**create**)한다.
+  - 주문생성시간(`orderDateTime`)은 주문생성시점으로 생성된다.
+  - 주문유형(`type`)은 비워둘 수 없다.
+  - 주문상태(`status`)는 대기중(`WAITING`)이 된다.
+  - 주문 아이템(`OrderLineItem`)은 1개 이상 있어야 한다.
+    - 같은 메뉴(`OrderLineItem menu`) 종류를 가지는 주문 아이템(`OrderLineItem`)은 두 번 이상 구성될 수 없다.
+    - 메뉴(`OrderLineItem menu`)는 이미 생성된 메뉴(`Menu`)여야 한다.
+    - 모든 메뉴(`OrderLineItem menu`)의 노출여부(`displayed`)는 노출(`true`)여야 한다.
+    - 모든 주문아이템 메뉴(`OrderLineItem menu`)의 가격(`price`)은 현재 메뉴(`Menu`)의 가격(`price`)과 같아야 한다.
+- 주문(`Order`)을 수락(**accept**)한다.
+  - 해당 주문(`Order`)의 상태(`status`)는 대기중(`WAITING`)이어야 한다.
+  - 주문상태(`status`)는 수락(`ACCEPTED`)으로 변경된다. 
+- 주문(`Order`)을 제공(**serve**)한다.
+  - 해당 주문의 상태(`status`)가 수락(`ACCEPTED`)이어야 한다.
+  - 주문상태(`status`)는 제공됨(`SERVED`)으로 변경된다.
+- 주문(`Order`)을 완료(**complete**)한다.
+  - 주문상태(`status`)는 완료(`COMPLETED`)로 변경된다.
+- 모든 주문(`Order`) 목록을 조회(**findAll**)할 수 있다.
+
+#### [배달 주문]
+##### 속성
+- 배달 주문은 공통 속성과 배달주소(`deliveryAddress`)를 가진다.
+  - 주문유형(`type`)은 배달 주문(`DELIVERY`)이다.
+  - 주문상태(`status`)는 대기중(`WAITING`) -> 수락(`ACCEPTED`) -> 제공됨(`SERVED`) -> 배달중(`DELIVERING`) -> 배달됨(`DELIVERED`) -> 완료(`COMPLETED`)의 순서를 가진다.
+```mermaid
+stateDiagram-v2
+  state 배달주문 {
+    direction LR
+    [*] --> 대기중: 주문 생성<br>(Create)<br>배달주소체크
+    대기중 --> 수락: 주문 수락<br>(Accept)<br>라이더 매칭 요청
+    수락 --> 제공됨: 주문 제공<br>(Serve)
+    제공됨 --> 배달중: 배달 시작<br>(Start Delivery)
+    배달중 --> 배달됨: 배달 완료<br>(Complete Delivery)
+    배달됨 --> 완료: 주문 완료<br>(Complete)
+  }
+```
+
+##### 행위
+- 주문(`Order`)을 생성(**create**)한다.
+  - 모든 메뉴(`OrderLineItem menu`)의 수량(`quantity`)은 0개 이상 주문해야 한다.
+  - 배달주소(`deliveryAddress`)는 비워둘 수 없다.
+- 해당 주문(`Order`)을 수락(**accept**)한다.
+  - 배달대행업체(Delivery Agency)를 통해 배달 기사님(Rider) 매칭을 요청한다.
+    - 요청 시 주문('Order')의 식별자와 배달주소(`deliveryAddress`)를 보낸다. 
+    - 또, 모든 주문아이템 메뉴(`OrderLineItem menu`)의 가격(`price`) 총 합을 함께 보낸다.
+- 사장님(Store Owner)은 배달 기사님(Rider)에게 음식을 제공(**serve**)한다.
+- 주문(`Order`)을 배달시작(**startDelivery**)한다.
+  - 해당 주문의 유형(`type`)은 배달주문(`DELIVERY`)이어야 한다.
+  - 해당 주문의 상태(`status`)가 제공됨(`SERVED`)이어야 한다.
+  - 주문상태(`status`)는 배달중(`DELIVERING`)으로 변경된다.
+- 주문(`Order`)을 배달완료(**completeDelivery**)한다.
+  - 해당 주문의 상태(`status`)가 배달중(`DELIVERING`)이어야 한다.
+  - 주문상태(`status`)는 배달됨(`DELIVERED`)으로 변경된다.
+- 주문(`Order`)을 완료(**complete**)한다.
+  - 해당 주문의 상태(`status`)가 배달됨(`DELIVERED`)이어야 한다.
+
+#### [포장 주문]
+##### 속성
+- 포장 주문은 공통 속성만 갖는다. 
+  - 주문유형(`type`)은 포장 주문(`TAKEOUT`)이다.
+  - 주문상태(`status`)는 대기중(`WAITING`) -> 수락(`ACCEPTED`) -> 제공됨(`SERVED`) -> 완료(`COMPLETED`)의 순서를 가진다.
+```mermaid
+stateDiagram-v2
+  state 포장주문 {
+    direction LR
+    [*] --> 대기중: 주문 생성<br>(Create)
+    대기중 --> 수락: 주문 수락<br>(Accept)
+    수락 --> 제공됨: 주문 제공<br>(Serve)
+    제공됨 --> 완료: 주문 완료<br>(Complete)
+  }
+```
+
+##### 행위
+- 주문(`Order`)을 생성(**create**)한다.
+  - 모든 메뉴(`OrderLineItem menu`)의 수량(`quantity`)은 0개 이상 주문해야 한다.
+- 주문(`Order`)을 수락(**accept**)한다.
+- 사장님(Store Owner)은 포장 고객님(Customer)에게 음식을 제공(**serve**)한다.
+- 주문(`Order`)을 완료(**complete**)한다.
+  - 해당 주문의 상태(`status`)가 제공됨(`SERVED`)이어야 한다.
+
+
+#### [매장내식사 주문]
+##### 속성
+- 매장내식사 주문은 공통 속성과 주문테이블(`orderTable`)을 가진다.
+  - 주문유형(`type`)은 매장내식사 주문(`EAT_IN`)이다.
+  - 주문상태(`status`)는 대기중(`WAITING`) -> 수락(`ACCEPTED`) -> 제공됨(`SERVED`) -> 완료(`COMPLETED`)의 순서를 가진다.
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> => : 주문테이블 착석<br>(Sit OrderTable)
+    state 매장주문 {
+    direction LR
+    =>  --> 대기중 : 주문 등록<br>(Create) 
+    대기중 --> 수락: 주문 수락<br>(Accept)
+    수락 --> 제공됨: 주문 제공<br>(Serve)
+    제공됨 --> 완료: 주문 완료<br>(Complete)
+  }
+    완료 --> [*] : 주문테이블 초기화<br>(Clear OrderTable)
+  
+```
+
+##### 행위
+- 주문(`Order`)을 생성(**create**)한다.
+  - 이미 생성된 주문테이블(`OrderTable`)의 점유여부(`occupied`)가 점유(`true`)상태 여야 한다.
+- 주문(`Order`)을 수락(**accept**)한다.
+- 사장님(Store Owner)은 주문 테이블(`OrderTable`)에 있는 매장 고객님(Customer)에게 음식을 제공(**serve**)한다.
+- 주문(`Order`)을 완료(**complete**)한다.
+  - 해당 주문의 상태(`status`)가 제공됨(`SERVED`)이어야 한다.
+  - 해당 주문테이블(`OrderTable`)의 모든 주문(`Order`)의 상태(`status`)가 완료(`COMPLETED`)이면 주문 테이블을 초기화(clear)한다.
+    - 변경할 고객의 수(`numberOfGuests`)는 0 이상 이어야 한다.
+    - 해당 주문테이블(`OrderTable`)이 점유중(`true`)인 상태이어야 한다.
