@@ -294,3 +294,15 @@ docker compose -p kitchenpos up -d
   - 변경할 고객의 수(`numberOfGuests`)는 0 이상 이어야 한다.
   - 해당 주문테이블(`OrderTable`)이 점유중(`true`)인 상태이어야 한다.
 - 모든 주문테이블(`OrderTable`) 목록을 조회(**findAll**)한다.
+
+
+### 주문 아이템(`OrderLineItem`)
+#### 속성
+- 주문 아이템(`OrderLineItem`)은 메뉴(`menu`), 수량(`quantity`), 가격(`price`)을 가진다.
+
+#### 정책
+- 주문 아이템(`OrderLineItem`)은 주문(`Order`)에서 1개 이상 구성된다.
+- 메뉴(`menu`)는 이미 생성된 (`Menu`)이어야 한다.
+- 메뉴(`menu`)는 노출(`true`)상태여야 한다.
+- 수량(`quantity`)은 비워둘 수 없다.
+- 고객님이 주문을 생성할 때, 주문 아이템의 가격(`price`)과 현재 키친포스에 생성된 메뉴(`Menu`)의 가격(`price`)은 같아야 한다.
