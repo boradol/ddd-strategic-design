@@ -192,162 +192,141 @@ docker compose -p kitchenpos up -d
 ### 상품(`Product`)
 #### 속성
 - 상품(`Product`)은 식별자, 이름(`name`), 가격(`price`)을 가진다.
-
-#### 행위
-- 상품(`Product`)을 생성(**create**)한다.
   - 이름(`name`)은 비워둘 수 없고, 비속어(profanity)가 포함될 수 없다.
     - 비속어 탐지 시스템(Profanity Detection System)을 통해서 이름에 비속어가 포함되지 않음(`false`)을 확인한다.
   - 가격(`price`)은 비워둘 수 없고, 0원 이상이어야 한다.
+
+#### 행위
+- 상품(`Product`)을 생성(**create**)한다.
+
 - 이미 생성된 상품(`Product`)의 가격을 변경(**change price**)한다.
-  - 가격(`price`)은 비워둘 수 없고, 0원 이상이어야 한다.
   - 해당 상품(`Product`)을 포함하는 메뉴(`Menu`)의 가격이 메뉴구성상품들 가격의 총 합보다 크면 해당 메뉴(`Menu`)의 노출여부(`displayed`)는 숨김(`false`)로 변경된다.
-    - 메뉴(`Menu`)와 상품(`Product`)의 자세한 [**가격 정책**](#가격정책)은 본문의 `메뉴구성상품 > 정책 > 가격정책`에서 확인할 수 있다.
+    - 메뉴(`Menu`)와 상품(`Product`)의 자세한 [**가격 정책**](#가격정책)은 본문의 `메뉴구성상품 > 가격정책`에서 확인할 수 있다.
+
 - 모든 상품(`Product`)의 목록을 조회(**findAll**)할 수 있다.
 
 
 ### 메뉴구성상품(`MenuProduct`)
 #### 속성
 - 메뉴구성상품(`MenuProduct`)은 상품(`product`)과 수량(`quantity`)을 가진다.
+  - 메뉴구성상품(`MenuProduct`)은 메뉴(`Menu`)에서 1개 이상 구성된다. 
+    - 상품(`product`)은 이미 생성된 상품(`Product`) 중에서 반드시 1개만 가진다.
+    - 수량(`quantity`)은 비워둘 수 없고, 0개 보다 커야한다. 한 상품당 개수를 의미한다.
+    >   예) 메뉴 : 순살치킨
+    >    - 메뉴구성상품(상품, 수량)        // 메뉴가 구성된 상품은 후라이드치킨, 양념치킨으로 2개이다.
+    >      - 상품 1 : (후라이드 치킨, 1개) // 상품 1개에 대한 수량으로 관리된다.
+    >      - 상품 2 : (양념 치킨, 2개)
 
-#### 정책
-##### 메뉴, 상품 그리고 메뉴구성상품의 관계
-- 메뉴구성상품(`MenuProduct`)은 메뉴(`Menu`)에서 1개 이상 구성된다. 
-  - 상품(`product`)은 이미 생성된 상품(`Product`) 중에서 반드시 1개만 가진다.
-  - 수량(`quantity`)은 비워둘 수 없고, 0개 보다 커야한다. 한 상품당 개수를 의미한다.
-    > 예) 메뉴 : 순살치킨
-    >  - 메뉴구성상품(상품, 수량)        // 메뉴가 구성된 상품은 후라이드치킨, 양념치킨으로 2개이다.
-    >    - 상품 1 : (후라이드 치킨, 1개) // 상품 1개에 대한 수량으로 관리된다.
-    >    - 상품 2 : (양념 치킨, 2개)
+      | 메뉴 : 순살치킨 | 상품(product) | 수량(quantity) |
+      |-----------|-------------|--------------|
+      | 메뉴구성상품 1  | 후라이드치킨     | 1개           |
+      | 메뉴구성상품 2  | 양념치킨        | 2개           |
 
-    | 메뉴 : 순살치킨 | 상품(product) | 수량(quantity) |
-    |-----------|-------------|--------------|
-    | 메뉴구성상품 1  | 후라이드치킨     | 1개           |
-    | 메뉴구성상품 2  | 양념치킨        | 2개           |
-
-##### 가격정책
-- 메뉴구성상품(`MenuProduct`)은 메뉴(`Menu`)와 관계있는 가격 정책을 따른다.
-- '모든 메뉴구성상품(`MenuProduct`)의 "변경된 상품의 가격(`product price`) * 수량(`quantity`)"의 총 합'보다 <br>현재 메뉴의 가격(`menu price`)이 작거나 같아야 한다.
-- 수식 : `현재 메뉴의 가격` <= `모든 메뉴구성상품의 (변경된 가격 * 수량)의 총 합`<br>
-  >  - 예) **메뉴** : 순살치킨(후라이드 1개 + 양념치킨 1개)의 가격 = `30,000`원 | **상품** : 후라이드 가격 = `15,000`원, 양념치킨 가격 = `16,000`원
-  >    - 변경 전 :
-  >      - `30,000`원(현재 메뉴 가격) < `31,000`원 = 15,000 * 1 + 16,000 * 1 (메뉴구성상품의 가격의 총 합)
-  >      - 가격 정책 만족하고, 현재 메뉴는 노출된 상태.
-  >    - 변경 후 : 후라이드 가격을 `10,000`원으로 변경한다.
-  >      - `30,000`원(현재 메뉴 가격) > `26,000`원 = **10,000** * 1 + 16,000 * 1 (변경 후 메뉴구성상품의 가격의 총 합)
-  >      - 가격 정책을 만족하지 않으므로 이 메뉴는 숨겨진 상태.
+  - 메뉴구성상품(`MenuProduct`)은 메뉴(`Menu`)와 관계있는 가격 정책을 따른다.
+    ##### 가격정책
+    - '모든 메뉴구성상품(`MenuProduct`)의 "변경된 상품의 가격(`product price`) * 수량(`quantity`)"의 총 합'보다 <br>현재 메뉴의 가격(`menu price`)이 작거나 같아야 한다.
+    - 수식 : `현재 메뉴의 가격` <= `모든 메뉴구성상품의 (변경된 가격 * 수량)의 총 합`<br>
+      >    - 예) **메뉴** : 순살치킨(후라이드 1개 + 양념치킨 1개)의 가격 = `30,000`원 | **상품** : 후라이드 가격 = `15,000`원, 양념치킨 가격 = `16,000`원
+      >      - 변경 전 :
+      >        - `30,000`원(현재 메뉴 가격) < `31,000`원 = 15,000 * 1 + 16,000 * 1 (메뉴구성상품의 가격의 총 합)
+      >        - 가격 정책 만족하고, 현재 메뉴는 노출된 상태.
+      >      - 변경 후 : 후라이드 가격을 `10,000`원으로 변경한다.
+      >        - `30,000`원(현재 메뉴 가격) > `26,000`원 = **10,000** * 1 + 16,000 * 1 (변경 후 메뉴구성상품의 가격의 총 합)
+      >        - 가격 정책을 만족하지 않으므로 이 메뉴는 숨겨진 상태.
 
 
 ### 메뉴그룹(`MenuGroup`)
 #### 속성
 - 메뉴그룹(`MenuGroup`)은 식별자, 이름(`name`)을 가진다.
+  - 이름(`name`)은 비워둘 수 없다.
 
 #### 행위
 - 메뉴그룹(`MenuGroup`)을 생성(**create**)한다.
-  - 이름(`name`)은 비워둘 수 없다.
+ 
 - 모든 메뉴그룹(`MenuGroup`)의 목록을 조회(findAll)할 수 있다.
 
 
 ### 메뉴(`Menu`)
 #### 속성
 - 메뉴(`Menu`)는 식별자, 이름(`name`), 가격(`price`), 노출여부(`displayed`), 메뉴그룹(`menuGroup`), 메뉴구성상품들(`menuProducts`)을 가진다.
-
-#### 행위
-- 메뉴(`Menu`)를 생성(**create**)한다.
   - 이름(`name`)은 비워둘 수 없고, 비속어(profanity)가 포함될 수 없다.
     - 비속어 탐지 시스템(Profanity Detection System)을 통해서 이름에 비속어가 포함되지 않음(`false`)을 확인한다.
   - 가격(`price`)은 비워둘 수 없고, 0원 이상이어야 한다.
   - 노출여부(`dispalyed`)는 노출(`true`)상태이거나 숨김(`false`)상태 중 선택한다.
   - 이미 생성된 메뉴그룹(`menuGroup`)에 반드시 1개 포함시켜야 한다.
-    > - 예) "순살치킨"메뉴눈 "추천메뉴"라는 메뉴그룹에 포함된다.
-  - 메뉴구성상품들(`menuProducts`)은 반드시 1개 이상 구성된다.
+    > - 예) "순살치킨"메뉴는 "추천메뉴"라는 메뉴그룹에 포함된다.
+  - 메뉴구성상품(`MenuProduct`)은 반드시 1개 이상 메뉴에 구성된다.
     - 같은 상품(`menuProduct product`)을 가지는 메뉴구성상품(`menuProduct`)은 두 번 이상 구성될 수 없다.
       > - 예) 3개의 [("양념치킨", 1개), ("양념치킨", 2개), (후라이드 치킨, 1개)] 메뉴구성상품들로 구성될 때, <br>"양념치킨"상품이 포함된 메뉴구성상품이 두 번 구성되게 할 수 없다.
     - 상품(`menuProduct product`)은 이미 생성된 상품(`Product`)에서 반드시 1개만 가진다.
-    - 각 수량이 (`menuProduct quantity`) 0개 이상이여야 한다.
+    - 각 수량(`menuProduct quantity`)이 0개 이상이여야 한다.
   - 메뉴구성상품들(`menuProducts`) 가격의 총 합보다 메뉴의 가격(`menu price`)이 작거나 같아야 한다.
-    - 메뉴(`Menu`)와 메뉴구성상품(`MenuProduct`)의 자세한 [**가격 정책**](#가격정책)은 본문의 `메뉴구성상품 > 정책 > 가격정책`에서 확인할 수 있다.
+    - 메뉴(`Menu`)와 메뉴구성상품(`MenuProduct`)의 자세한 [**가격 정책**](#가격정책)은 본문의 `메뉴구성상품 > 가격정책`에서 확인할 수 있다.
+
+#### 행위
+- 메뉴(`Menu`)를 생성(**create**)한다.
+ 
 - 이미 생성된 메뉴(`Menu`)의 가격을 변경(**change price**)한다.
-  - 가격(`price`)은 비워둘 수 없고, 0원 이상이어야 한다.
+  - 변경할 가격(`price`)은 비워둘 수 없고, 0원 이상이어야 한다.
   - 메뉴구성상품들(`menuProducts`) 가격의 총 합보다 변경된 메뉴의 가격(`menu price`)이 작거나 같아야 한다.
+ 
 - 이미 생성된 메뉴(`Menu`)를 노출(**display**)한다.
   - 메뉴구성상품들(`menuProducts`) 가격의 총 합보다 메뉴의 가격(`menu price`)이 작거나 같아야 한다.
   - 노출여부(`displayed`)는 노출(`true`)상태로 변경한다.
+
 - 이미 생성된 메뉴(`Menu`)를 숨긴(**undisplay**)다.
   - 노출여부(`displayed`)는 숨김(`false`)상태로 변경한다.
+
 - 모든 메뉴(`Menu`)의 목록을 조회(**findAll**)할 수 있다.
 
 
 ### 주문테이블(`OrderTable`)
 #### 속성
 - 주문테이블(`OrderTable`)은 식별자, 이름(`name`), 고객의 수(`numberOfGuests`), 점유여부(`occupied`)를 가진다.
+  - 이름 (`name`)은 비워둘 수 없다.
+  - 고객의 수(`numberOfGuests`)는 0 이상 이어야 한다.
+  - 점유여부(`occupied`)는 점유중(`true`)와 점유안함(`false`)상태가 있다.
 
 #### 행위
 - 주문테이블(`OrderTable`)을 생성(**create**)한다.
-  - 이름 (`name`)은 비워둘 수 없다.
   - 고객의 수(`numberOfGuests`)는 0명 이다.
   - 점유여부(`occupied`)는 점유안함(`false`)상태이다.
+
 - 해당 주문테이블(`OrderTable`)은 착석(**sit**)되었다.
   - 점유여부(`occupied`)가 점유중(`true`)으로 변경한다.
+
 - 해당 주문테이블(`OrderTable`)을 초기화(**clear**)되었다.
   - 해당 주문테이블`OrderTable`에 생성된 모든 주문(`Order`)의 주문 상태(`OrderStatus`)가 주문완료(`COMPLETED`) 이어야 한다.
   - 점유여부(`occupied`)가 점유안함(`false`)으로 변경한다.
   - 고객의 수(`numberOfGuests`)가 0으로 변경한다.
+
 - 해당 주문테이블(`OrderTable`)의 고객의 수를 변경(**change numberOfGuests**)한다.
-  - 변경할 고객의 수(`numberOfGuests`)는 0 이상 이어야 한다.
   - 해당 주문테이블(`OrderTable`)이 점유중(`true`)인 상태이어야 한다.
+
 - 모든 주문테이블(`OrderTable`) 목록을 조회(**findAll**)한다.
 
 
 ### 주문 아이템(`OrderLineItem`)
 #### 속성
 - 주문 아이템(`OrderLineItem`)은 메뉴(`menu`), 수량(`quantity`), 가격(`price`)을 가진다.
-
-#### 정책
-- 주문 아이템(`OrderLineItem`)은 주문(`Order`)에서 1개 이상 구성된다.
-- 메뉴(`menu`)는 이미 생성된 (`Menu`)이어야 한다.
-- 메뉴(`menu`)는 노출(`true`)상태여야 한다.
-- 수량(`quantity`)은 비워둘 수 없다.
-- 고객님이 주문을 생성할 때, 주문 아이템의 가격(`price`)과 현재 키친포스에 생성된 메뉴(`Menu`)의 가격(`price`)은 같아야 한다.
+  - 주문 아이템(`OrderLineItem`)은 주문(`Order`)에서 1개 이상 구성된다.
+  - 메뉴(`menu`)는 이미 생성된 (`Menu`)이어야 한다.
+  - 수량(`quantity`)은 비워둘 수 없고, 0개 이상이다.
+  - 고객님이 주문을 생성할 때, 주문 아이템의 가격(`price`)과 현재 키친포스에 생성된 메뉴(`Menu`)의 가격(`price`)은 같아야 한다.
 
 
 ### 주문(`Order`)
-> 주문은 크게 공통, 배달, 포장, 매장내식사로 분류하여 속성과 행위를 작성한다.
-> - 공통 : 배달, 포장, 매장내식사에 공통으로 들어가는 속성과 행위를 주문상태별로 작성한다.
-> - 주문유형별 : 공통인 속성과 행위를 제외한 주문 유형별 추가적인 속성과 행위를 주문 상태별로 작성한다.
->   - 주문유형별에서는 Flow-chart를 추가하였다.
-
-#### [공통]
-##### 속성
-- 주문(`Order`)은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템(`OrderLineItem`)을 가진다.
-  - 주문유형(`type`)은 배달 주문(`DELIVERY`), 포장 주문(`TAKEOUT`), 매장내식사 주문(`EAT_IN`)으로 나뉜다.
-  - 주문상태(`status`)는 대기중(`WAITING`), 수락(`ACCEPTED`), 제공됨(`SERVED`), 배달중(`DELIVERING`), 배달됨(`DELIVERED`), 완료(`COMPLETED`)의 공통 행위를 정의한다.
-
-##### 행위
-- 주문을 생성(**create**)한다.
-  - 주문생성시간(`orderDateTime`)은 주문생성시점으로 생성된다.
-  - 주문유형(`type`)은 비워둘 수 없다.
-  - 주문상태(`status`)는 대기중(`WAITING`)이 된다.
-  - 주문 아이템(`OrderLineItem`)은 1개 이상 있어야 한다.
-    - 같은 메뉴(`OrderLineItem menu`) 종류를 가지는 주문 아이템(`OrderLineItem`)은 두 번 이상 구성될 수 없다.
-    - 메뉴(`OrderLineItem menu`)는 이미 생성된 메뉴(`Menu`)여야 한다.
-    - 모든 메뉴(`OrderLineItem menu`)의 노출여부(`displayed`)는 노출(`true`)여야 한다.
-    - 모든 주문아이템 메뉴(`OrderLineItem menu`)의 가격(`price`)은 현재 메뉴(`Menu`)의 가격(`price`)과 같아야 한다.
-- 주문을 수락(**accept**)한다.
-  - 해당 주문(`Order`)의 상태(`status`)는 대기중(`WAITING`)이어야 한다.
-  - 주문상태(`status`)는 수락(`ACCEPTED`)으로 변경된다. 
-- 주문을 제공(**serve**)한다.
-  - 해당 주문의 상태(`status`)가 수락(`ACCEPTED`)이어야 한다.
-  - 주문상태(`status`)는 제공됨(`SERVED`)으로 변경된다.
-- 주문을 배달시작(**startDelivery**)한다.
-- 주문을 배달완료(**completeDelivery**)한다.
-- 주문을 완료(**complete**)한다.
-  - 주문상태(`status`)는 완료(`COMPLETED`)로 변경된다.
-- 모든 주문(`Order`) 목록을 조회(**findAll**)할 수 있다.
 
 #### [배달 주문]
 ##### 속성
-- 배달 주문은 공통 속성과 배달주소(`deliveryAddress`)를 가진다.
-  - 주문유형(`type`)은 배달 주문(`DELIVERY`)이다.
+- 배달 주문은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템들(`orderLineItems`), 배달주소(`deliveryAddress`)를 가진다.
+  - 주문생성시간(`orderDateTime`)은 주문이 생성될 때의 시간이다.
+  - 주문 아이템(`orderLineItems`)은 1개 이상 있어야 한다.
+    - 같은 메뉴(`orderLineItem menu`) 종류를 가지는 주문 아이템(`OrderLineItem`)은 두 번 이상 구성될 수 없다.
+    - 메뉴(`orderLineItem menu`)는 이미 생성된 메뉴(`Menu`)여야 한다.
+    - 모든 메뉴(`orderLineItems menu`)의 노출여부(`displayed`)는 노출(`true`)여야 한다.
+    - 모든 주문아이템 메뉴(`orderLineItems menu`)의 가격(`price`)은 현재 메뉴(`Menu`)의 가격(`price`)과 같아야 한다.
+  - 주문유형(`type`)은 비워둘 수 없고, 배달 주문(`DELIVERY`)이다.
   - 주문상태(`status`)는 대기중(`WAITING`) -> 수락(`ACCEPTED`) -> 제공됨(`SERVED`) -> 배달중(`DELIVERING`) -> 배달됨(`DELIVERED`) -> 완료(`COMPLETED`)의 순서를 가진다.
 ```mermaid
 stateDiagram-v2
@@ -363,28 +342,46 @@ stateDiagram-v2
 ```
 
 ##### 행위
-- 생성(**create**)
-  - 모든 메뉴(`OrderLineItem menu`)의 수량(`quantity`)은 0개 이상 주문해야 한다.
+- 주문을 생성(**create**)한다.
+  - 주문상태(`status`)는 대기중(`WAITING`)이 된다.
+  - 모든 메뉴(`orderLineItem menu`)의 수량(`quantity`)은 0개 이상 주문해야 한다.
   - 배달주소(`deliveryAddress`)는 비워둘 수 없다.
-- 수락(**accept**)
+
+- 주문을 수락(**accept**)한다.
+  - 해당 주문(`Order`)의 상태(`status`)는 대기중(`WAITING`)이어야 한다.
+  - 주문상태(`status`)는 수락(`ACCEPTED`)으로 변경된다.
   - 배달대행업체(Delivery Agency)를 통해 배달 기사님(Rider) 매칭을 요청한다.
     - 요청 시 주문('Order')의 식별자와 배달주소(`deliveryAddress`)를 보낸다. 
-    - 또, 모든 주문아이템 메뉴(`OrderLineItem menu`)의 가격(`price`) 총 합을 함께 보낸다.
-- 제공(**serve**) : 사장님(Store Owner)은 배달 기사님(Rider)에게 음식을 제공한다.
-- 배달시작(**startDelivery**)
+    - 또, 모든 주문아이템 메뉴(`orderLineItem menu`)의 가격(`price`) 총 합을 함께 보낸다.
+
+- 사장님(Store Owner)은 배달 기사님(Rider)에게 음식을 제공(**serve**)한다.
+  - 해당 주문의 상태(`status`)가 수락(`ACCEPTED`)이어야 한다.
+  - 주문상태(`status`)는 제공됨(`SERVED`)으로 변경된다.
+
+- 주문을 배달시작(**startDelivery**)한다.
   - 해당 주문의 유형(`type`)은 배달주문(`DELIVERY`)이어야 한다.
   - 해당 주문의 상태(`status`)가 제공됨(`SERVED`)이어야 한다.
   - 주문상태(`status`)는 배달중(`DELIVERING`)으로 변경된다.
-- 배달완료(**completeDelivery**)
+
+- 주문을 배달완료(**completeDelivery**)한다.
   - 해당 주문의 상태(`status`)가 배달중(`DELIVERING`)이어야 한다.
   - 주문상태(`status`)는 배달됨(`DELIVERED`)으로 변경된다.
-- 완료(**complete**)
+
+- 주문을 완료(**complete**)한다.
   - 해당 주문의 상태(`status`)가 배달됨(`DELIVERED`)이어야 한다.
+  - 주문상태(`status`)는 완료(`COMPLETED`)로 변경된다.
+
 
 #### [포장 주문]
 ##### 속성
-- 포장 주문은 공통 속성만 갖는다. 
-  - 주문유형(`type`)은 포장 주문(`TAKEOUT`)이다.
+- 포장 주문은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템들(`orderLineItems`)을 가진다. 
+  - 주문생성시간(`orderDateTime`)은 주문이 생성될 때의 시간이다.
+  - 주문 아이템(`orderLineItem`)은 1개 이상 있어야 한다.
+    - 같은 메뉴(`orderLineItem menu`) 종류를 가지는 주문 아이템(`OrderLineItem`)은 두 번 이상 구성될 수 없다.
+    - 메뉴(`orderLineItem menu`)는 이미 생성된 메뉴(`Menu`)여야 한다.
+    - 모든 메뉴(`orderLineItems menu`)의 노출여부(`displayed`)는 노출(`true`)여야 한다.
+    - 모든 주문아이템의 메뉴(`orderLineItems menu`)의 가격(`price`)은 현재 메뉴(`Menu`)의 가격(`price`)과 같아야 한다.
+  - 주문유형(`type`)은 비워둘 수 없고,포장 주문(`TAKEOUT`)이다.
   - 주문상태(`status`)는 대기중(`WAITING`) -> 수락(`ACCEPTED`) -> 제공됨(`SERVED`) -> 완료(`COMPLETED`)의 순서를 가진다.
 ```mermaid
 stateDiagram-v2
@@ -398,18 +395,33 @@ stateDiagram-v2
 ```
 
 ##### 행위
-- 생성(**create**)
+- 주문을 생성(**create**)한다.
+  - 주문상태(`status`)는 대기중(`WAITING`)이 된다.
   - 모든 메뉴(`OrderLineItem menu`)의 수량(`quantity`)은 0개 이상 주문해야 한다.
-- 수락(**accept**)
-- 제공(**serve**) : 사장님(Store Owner)은 포장 고객님(Customer)에게 음식을 제공한다.
-- 완료(**complete**)
+
+- 주문을 수락(**accept**)한다.
+  - 해당 주문(`Order`)의 상태(`status`)는 대기중(`WAITING`)이어야 한다.
+  - 주문상태(`status`)는 수락(`ACCEPTED`)으로 변경된다.
+
+- 사장님(Store Owner)은 포장 고객님(Customer)에게 음식을 제공(**serve**)한다.
+  - 해당 주문의 상태(`status`)가 수락(`ACCEPTED`)이어야 한다.
+  - 주문상태(`status`)는 제공됨(`SERVED`)으로 변경된다.
+
+- 주문을 완료(**complete**)한다.
   - 해당 주문의 상태(`status`)가 제공됨(`SERVED`)이어야 한다.
+  - 주문상태(`status`)는 완료(`COMPLETED`)로 변경된다.
 
 
 #### [매장내식사 주문]
 ##### 속성
-- 매장내식사 주문은 공통 속성과 주문테이블(`orderTable`)을 가진다.
-  - 주문유형(`type`)은 매장내식사 주문(`EAT_IN`)이다.
+- 매장내식사 주문은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템들(`orderLineItems`), 주문테이블(`orderTable`)을 가진다.
+  - 주문생성시간(`orderDateTime`)은 주문이 생성될 때의 시간이다.
+  - 주문 아이템(`orderLineItem`)은 1개 이상 있어야 한다.
+    - 같은 메뉴(`orderLineItem menu`) 종류를 가지는 주문 아이템(`OrderLineItem`)은 두 번 이상 구성될 수 없다.
+    - 메뉴(`orderLineItem menu`)는 이미 생성된 메뉴(`Menu`)여야 한다.
+    - 모든 메뉴(`orderLineItems menu`)의 노출여부(`displayed`)는 노출(`true`)여야 한다.
+    - 모든 주문아이템 메뉴(`orderLineItems menu`)의 가격(`price`)은 현재 메뉴(`Menu`)의 가격(`price`)과 같아야 한다.
+  - 주문유형(`type`)은 비워둘 수 없고,매장내식사 주문(`EAT_IN`)이다.
   - 주문상태(`status`)는 대기중(`WAITING`) -> 수락(`ACCEPTED`) -> 제공됨(`SERVED`) -> 완료(`COMPLETED`)의 순서를 가진다.
 ```mermaid
 stateDiagram-v2
@@ -427,12 +439,21 @@ stateDiagram-v2
 ```
 
 ##### 행위
-- 생성(**create**)
+- 주문을 생성(**create**)한다.
+  - 주문상태(`status`)는 대기중(`WAITING`)이 된다.
   - 이미 생성된 주문테이블(`OrderTable`)의 점유여부(`occupied`)가 점유(`true`)상태 여야 한다.
-- 수락(**accept**)
-- 제공(**serve**) : 사장님(Store Owner)은 주문 테이블(`OrderTable`)에 있는 매장 고객님(Customer)에게 음식을 제공한다.
-- 완료(**complete**)
+
+- 주문을 수락(**accept**)한다.
+  - 해당 주문(`Order`)의 상태(`status`)는 대기중(`WAITING`)이어야 한다.
+  - 주문상태(`status`)는 수락(`ACCEPTED`)으로 변경된다.
+
+- 사장님(Store Owner)은 주문 테이블(`OrderTable`)에 있는 매장 고객님(Customer)에게 음식을 제공(**serve**)한다.
+  - 해당 주문의 상태(`status`)가 수락(`ACCEPTED`)이어야 한다.
+  - 주문상태(`status`)는 제공됨(`SERVED`)으로 변경된다.
+
+- 주문을 완료(**complete**)한다.
   - 해당 주문의 상태(`status`)가 제공됨(`SERVED`)이어야 한다.
+  - 주문상태(`status`)는 완료(`COMPLETED`)로 변경된다.
   - 해당 주문테이블(`OrderTable`)의 모든 주문(`Order`)의 상태(`status`)가 완료(`COMPLETED`)이면 주문 테이블을 초기화(clear)한다.
     - 변경할 고객의 수(`numberOfGuests`)는 0 이상 이어야 한다.
     - 해당 주문테이블(`OrderTable`)이 점유중(`true`)인 상태이어야 한다.
