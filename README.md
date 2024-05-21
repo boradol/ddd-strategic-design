@@ -381,7 +381,7 @@ stateDiagram-v2
     - 메뉴(`orderLineItem menu`)는 이미 생성된 메뉴(`Menu`)여야 한다.
     - 모든 메뉴(`orderLineItems menu`)의 노출여부(`displayed`)는 노출(`true`)여야 한다.
     - 모든 주문아이템의 메뉴(`orderLineItems menu`)의 가격(`price`)은 현재 메뉴(`Menu`)의 가격(`price`)과 같아야 한다.
-  - 주문유형(`type`)은 비워둘 수 없고,포장 주문(`TAKEOUT`)이다.
+  - 주문유형(`type`)은 비워둘 수 없고, 포장 주문(`TAKEOUT`)이다.
   - 주문상태(`status`)는 대기중(`WAITING`) -> 수락(`ACCEPTED`) -> 제공됨(`SERVED`) -> 완료(`COMPLETED`)의 순서를 가진다.
 ```mermaid
 stateDiagram-v2
@@ -421,7 +421,7 @@ stateDiagram-v2
     - 메뉴(`orderLineItem menu`)는 이미 생성된 메뉴(`Menu`)여야 한다.
     - 모든 메뉴(`orderLineItems menu`)의 노출여부(`displayed`)는 노출(`true`)여야 한다.
     - 모든 주문아이템 메뉴(`orderLineItems menu`)의 가격(`price`)은 현재 메뉴(`Menu`)의 가격(`price`)과 같아야 한다.
-  - 주문유형(`type`)은 비워둘 수 없고,매장내식사 주문(`EAT_IN`)이다.
+  - 주문유형(`type`)은 비워둘 수 없고, 매장내식사 주문(`EAT_IN`)이다.
   - 주문상태(`status`)는 대기중(`WAITING`) -> 수락(`ACCEPTED`) -> 제공됨(`SERVED`) -> 완료(`COMPLETED`)의 순서를 가진다.
 ```mermaid
 stateDiagram-v2
