@@ -152,16 +152,16 @@ docker compose -p kitchenpos up -d
 
 ### 주문테이블
 
-| 한글 용어    | 영어 용어                   | 설명                                                      |
-|----------|-------------------------|---------------------------------------------------------|
-| 주문테이블    | Order Table             | 매장주문 고객을 관리하기 위해 사용하는 테이블을 의미한다.                        |
-| 주문테이블 명  | Name                    | 주문테이블의 이름을 의미한다.                                        |
-| 점유여부     | Occupied                | 주문테이블의 점유여부를 정할 수 있다. 점유중과 점유안함 두 가지 상태가 있다.            |
-| 고객의 수    | Number of Guests        | 주문테이블을 이용중인 고객의 수를 의미한다.                                |
-| 생성       | Create                  | 주문테이블을 생성한다. 테이블은 점유안함 상태이고 고객의 수는 0명이다.                |
-| 착석       | Sit                     | 주문테이블을 점유중인 상태로 변경한다.                                   |
-| 초기화      | Clear                   | 주문테이블을 초기화한다. 주문완료 상태에서 주문테이블은 점유안함 상태이고 고객의 수는 0명이 된다. |
-| 고객의 수 변경 | Change Number of Guests | 주문테이블이 점유중인 상태에서 고객의 수를 변경할 수 있다.                       |
+| 한글 용어       | 영어 용어                   | 설명                                                     |
+|-------------|-------------------------|--------------------------------------------------------|
+| 주문테이블       | Order Table             | 매장주문 고객을 관리하기 위해 사용하는 테이블을 의미한다.                       |
+| 주문테이블 명     | Name                    | 주문테이블의 이름을 의미한다.                                       |
+| 점유여부        | Occupied                | 주문테이블의 점유여부를 정할 수 있다. 점유중과 점유해제 두 가지 상태가 있다.           |
+| 착석한 고객 수    | Number of Guests        | 주문테이블을 이용중인 고객의 수를 의미한다.                               |
+| 생성          | Create                  | 주문테이블을 생성한다. 테이블은 점유해제 상태이고 착석한 고객 수는 0명이다.            |
+| 착석          | Sit                     | 주문테이블을 점유중인 상태로 변경한다.                                  |
+| 초기화         | Clear                   | 주문테이블을 초기화한다. 주문완료 상태에서 주문테이블은 점유해제 상태이고 고객 수는 0명이 된다. |
+| 착석한 고객 수 변경 | Change Number of Guests | 주문테이블이 점유중인 상태에서 착석한 고객 수를 변경할 수 있다.                   |
 
 
 ### 주문
@@ -200,7 +200,7 @@ docker compose -p kitchenpos up -d
 - 상품(`Product`)을 생성(**create**)한다.
 
 - 이미 생성된 상품(`Product`)의 가격을 변경(**change price**)한다.
-  - 해당 상품(`Product`)을 포함하는 메뉴(`Menu`)의 가격이 메뉴구성상품들 가격의 총 합보다 크면 해당 메뉴(`Menu`)의 노출여부(`displayed`)는 숨김(`false`)로 변경된다.
+  - 해당 상품(`Product`)을 포함하는 메뉴(`Menu`)의 가격이 메뉴구성상품 가격의 총 합보다 크면 해당 메뉴(`Menu`)의 노출여부(`displayed`)는 숨김(`false`)로 변경된다.
     - 메뉴(`Menu`)와 상품(`Product`)의 자세한 [**가격 정책**](#가격정책)은 본문의 `메뉴구성상품 > 가격정책`에서 확인할 수 있다.
 
 - 모든 상품(`Product`)의 목록을 조회(**findAll**)할 수 있다.
@@ -248,7 +248,7 @@ docker compose -p kitchenpos up -d
 
 ### 메뉴(`Menu`)
 #### 속성
-- 메뉴(`Menu`)는 식별자, 이름(`name`), 가격(`price`), 노출여부(`displayed`), 메뉴그룹(`menuGroup`), 메뉴구성상품들(`menuProducts`)을 가진다.
+- 메뉴(`Menu`)는 식별자, 이름(`name`), 가격(`price`), 노출여부(`displayed`), 메뉴그룹(`menuGroup`), 메뉴구성상품 목록(`menuProducts`)을 가진다.
   - 이름(`name`)은 비워둘 수 없고, 비속어(profanity)가 포함될 수 없다.
     - 비속어 탐지 시스템(Profanity Detection System)을 통해서 이름에 비속어가 포함되지 않음(`false`)을 확인한다.
   - 가격(`price`)은 비워둘 수 없고, 0원 이상이어야 한다.
@@ -257,10 +257,10 @@ docker compose -p kitchenpos up -d
     > - 예) "순살치킨"메뉴는 "추천메뉴"라는 메뉴그룹에 포함된다.
   - 메뉴구성상품(`MenuProduct`)은 반드시 1개 이상 메뉴에 구성된다.
     - 같은 상품(`menuProduct product`)을 가지는 메뉴구성상품(`menuProduct`)은 두 번 이상 구성될 수 없다.
-      > - 예) 3개의 [("양념치킨", 1개), ("양념치킨", 2개), (후라이드 치킨, 1개)] 메뉴구성상품들로 구성될 때, <br>"양념치킨"상품이 포함된 메뉴구성상품이 두 번 구성되게 할 수 없다.
+      > - 예) 3개의 [("양념치킨", 1개), ("양념치킨", 2개), (후라이드 치킨, 1개)] 메뉴구성상품 목록으로 구성될 때, <br>"양념치킨"상품이 포함된 메뉴구성상품이 두 번 구성되게 할 수 없다.
     - 상품(`menuProduct product`)은 이미 생성된 상품(`Product`)에서 반드시 1개만 가진다.
     - 각 수량(`menuProduct quantity`)이 0개 이상이여야 한다.
-  - 메뉴구성상품들(`menuProducts`) 가격의 총 합보다 메뉴의 가격(`menu price`)이 작거나 같아야 한다.
+  - 메뉴구성상품(`menuProducts`) 가격의 총 합보다 메뉴의 가격(`menu price`)이 작거나 같아야 한다.
     - 메뉴(`Menu`)와 메뉴구성상품(`MenuProduct`)의 자세한 [**가격 정책**](#가격정책)은 본문의 `메뉴구성상품 > 가격정책`에서 확인할 수 있다.
 
 #### 행위
@@ -282,25 +282,25 @@ docker compose -p kitchenpos up -d
 
 ### 주문테이블(`OrderTable`)
 #### 속성
-- 주문테이블(`OrderTable`)은 식별자, 이름(`name`), 고객의 수(`numberOfGuests`), 점유여부(`occupied`)를 가진다.
+- 주문테이블(`OrderTable`)은 식별자, 이름(`name`), 착석한 고객 수(`numberOfGuests`), 점유여부(`occupied`)를 가진다.
   - 이름 (`name`)은 비워둘 수 없다.
-  - 고객의 수(`numberOfGuests`)는 0 이상 이어야 한다.
-  - 점유여부(`occupied`)는 점유중(`true`)와 점유안함(`false`)상태가 있다.
+  - 착석한 고객 수(`numberOfGuests`)는 0 이상 이어야 한다.
+  - 점유여부(`occupied`)는 점유중(`true`)와 점유해제(`false`)상태가 있다.
 
 #### 행위
 - 주문테이블(`OrderTable`)을 생성(**create**)한다.
-  - 고객의 수(`numberOfGuests`)는 0명 이다.
-  - 점유여부(`occupied`)는 점유안함(`false`)상태이다.
+  - 착석한 고객 수(`numberOfGuests`)는 0명 이다.
+  - 점유여부(`occupied`)는 점유해제(`false`)상태이다.
 
 - 해당 주문테이블(`OrderTable`)은 착석(**sit**)되었다.
   - 점유여부(`occupied`)가 점유중(`true`)으로 변경한다.
 
 - 해당 주문테이블(`OrderTable`)을 초기화(**clear**)되었다.
   - 해당 주문테이블`OrderTable`에 생성된 모든 주문(`Order`)의 주문 상태(`OrderStatus`)가 주문완료(`COMPLETED`) 이어야 한다.
-  - 점유여부(`occupied`)가 점유안함(`false`)으로 변경한다.
-  - 고객의 수(`numberOfGuests`)가 0으로 변경한다.
+  - 점유여부(`occupied`)가 점유해제(`false`)로 변경한다.
+  - 착석한 고객 수(`numberOfGuests`)가 0으로 변경한다.
 
-- 해당 주문테이블(`OrderTable`)의 고객의 수를 변경(**change numberOfGuests**)한다.
+- 해당 주문테이블(`OrderTable`)의 착석한 고객 수를 변경(**change numberOfGuests**)한다.
   - 해당 주문테이블(`OrderTable`)이 점유중(`true`)인 상태이어야 한다.
 
 - 모든 주문테이블(`OrderTable`) 목록을 조회(**findAll**)한다.
@@ -319,7 +319,7 @@ docker compose -p kitchenpos up -d
 
 #### [배달 주문]
 ##### 속성
-- 배달 주문은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템들(`orderLineItems`), 배달주소(`deliveryAddress`)를 가진다.
+- 배달 주문은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템 목(`orderLineItems`), 배달주소(`deliveryAddress`)를 가진다.
   - 주문생성시간(`orderDateTime`)은 주문이 생성될 때의 시간이다.
   - 주문 아이템(`orderLineItems`)은 1개 이상 있어야 한다.
     - 같은 메뉴(`orderLineItem menu`) 종류를 가지는 주문 아이템(`OrderLineItem`)은 두 번 이상 구성될 수 없다.
@@ -374,7 +374,7 @@ stateDiagram-v2
 
 #### [포장 주문]
 ##### 속성
-- 포장 주문은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템들(`orderLineItems`)을 가진다. 
+- 포장 주문은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템 목록(`orderLineItems`)을 가진다. 
   - 주문생성시간(`orderDateTime`)은 주문이 생성될 때의 시간이다.
   - 주문 아이템(`orderLineItem`)은 1개 이상 있어야 한다.
     - 같은 메뉴(`orderLineItem menu`) 종류를 가지는 주문 아이템(`OrderLineItem`)은 두 번 이상 구성될 수 없다.
@@ -414,7 +414,7 @@ stateDiagram-v2
 
 #### [매장내식사 주문]
 ##### 속성
-- 매장내식사 주문은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템들(`orderLineItems`), 주문테이블(`orderTable`)을 가진다.
+- 매장내식사 주문은 식별자, 주문생성시간(`orderDateTime`), 주문유형(`type`), 주문상태(`status`), 주문 아이템 목록(`orderLineItems`), 주문테이블(`orderTable`)을 가진다.
   - 주문생성시간(`orderDateTime`)은 주문이 생성될 때의 시간이다.
   - 주문 아이템(`orderLineItem`)은 1개 이상 있어야 한다.
     - 같은 메뉴(`orderLineItem menu`) 종류를 가지는 주문 아이템(`OrderLineItem`)은 두 번 이상 구성될 수 없다.
@@ -441,7 +441,7 @@ stateDiagram-v2
 ##### 행위
 - 주문을 생성(**create**)한다.
   - 주문상태(`status`)는 대기중(`WAITING`)이 된다.
-  - 이미 생성된 주문테이블(`OrderTable`)의 점유여부(`occupied`)가 점유(`true`)상태 여야 한다.
+  - 이미 생성된 주문테이블(`OrderTable`)의 점유여부(`occupied`)가 점유중(`true`)상태 여야 한다.
 
 - 주문을 수락(**accept**)한다.
   - 해당 주문(`Order`)의 상태(`status`)는 대기중(`WAITING`)이어야 한다.
@@ -455,5 +455,5 @@ stateDiagram-v2
   - 해당 주문의 상태(`status`)가 제공됨(`SERVED`)이어야 한다.
   - 주문상태(`status`)는 완료(`COMPLETED`)로 변경된다.
   - 해당 주문테이블(`OrderTable`)의 모든 주문(`Order`)의 상태(`status`)가 완료(`COMPLETED`)이면 주문 테이블을 초기화(clear)한다.
-    - 변경할 고객의 수(`numberOfGuests`)는 0 이상 이어야 한다.
+    - 변경할 착석한 고객 수(`numberOfGuests`)는 0 이상 이어야 한다.
     - 해당 주문테이블(`OrderTable`)이 점유중(`true`)인 상태이어야 한다.
