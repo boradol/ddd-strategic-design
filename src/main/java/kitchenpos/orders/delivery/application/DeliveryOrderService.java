@@ -7,7 +7,6 @@ import kitchenpos.orders.delivery.domain.DeliveryOrder;
 import kitchenpos.orders.delivery.domain.DeliveryOrderLineItem;
 import kitchenpos.orders.delivery.domain.DeliveryOrderRepository;
 import kitchenpos.orders.delivery.domain.DeliveryOrderStatus;
-import kitchenpos.orders.delivery.infra.DeliveryAgencyClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
