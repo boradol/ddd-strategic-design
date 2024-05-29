@@ -2,7 +2,7 @@ package kitchenpos.orders.eatin.application;
 
 import kitchenpos.menus.domain.Menu;
 import kitchenpos.menus.domain.MenuRepository;
-import kitchenpos.orders.common.OrderType;
+import kitchenpos.common.domain.OrderType;
 import kitchenpos.orders.eatin.domain.EatInOrder;
 import kitchenpos.orders.eatin.domain.EatInOrderLineItem;
 import kitchenpos.orders.eatin.domain.EatInOrderRepository;

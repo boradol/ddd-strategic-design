@@ -2,7 +2,7 @@ package kitchenpos.orders.application.takeout;
 
 import kitchenpos.menus.application.InMemoryMenuRepository;
 import kitchenpos.menus.domain.MenuRepository;
-import kitchenpos.orders.common.OrderType;
+import kitchenpos.common.domain.OrderType;
 import kitchenpos.orders.takeout.application.TakeoutOrderService;
 import kitchenpos.orders.takeout.domain.TakeoutOrder;
 import kitchenpos.orders.takeout.domain.TakeoutOrderLineItem;

@@ -3,7 +3,7 @@ package kitchenpos;
 import kitchenpos.menus.domain.Menu;
 import kitchenpos.menus.domain.MenuGroup;
 import kitchenpos.menus.domain.MenuProduct;
-import kitchenpos.orders.common.OrderType;
+import kitchenpos.common.domain.OrderType;
 import kitchenpos.orders.delivery.domain.DeliveryOrder;
 import kitchenpos.orders.delivery.domain.DeliveryOrderLineItem;
 import kitchenpos.orders.delivery.domain.DeliveryOrderStatus;
